@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'active_shipping'
 ############# Added gems #################
 gem 'jquery-turbolinks'
 
