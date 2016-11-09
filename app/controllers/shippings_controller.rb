@@ -3,11 +3,11 @@ class ShippingsController < ApplicationController
 attr_reader :ups_rates, :fedex_rates
 
   def find_rate
-    packages = ActiveShipping::Package.new(100, [93,10], cylinder: true)
+    packages = ActiveShipping::Package.new(params[:weight].to_i, [93,10], {cylinder: true})
 
-    origin = ActiveShipping::Location.new(country: 'US', state: 'WA', city: 'Seattle', zip: '98052')
+    origin = ActiveShipping::Location.new(country: 'US', zip: params[:origin_zip])
 
-    destination = ActiveShipping::Location.new(country: 'US', state: 'CA', city: 'Beverly Hills', zip: '90210')
+    destination = ActiveShipping::Location.new(country: 'US', zip: params[:dest_zip])
 
     ups = ActiveShipping::UPS.new(login: ENV["UPS_LOGIN"], password: ENV["UPS_PWD"], key: ENV["UPS_KEY"])
     response = ups.find_rates(origin, destination, packages)
