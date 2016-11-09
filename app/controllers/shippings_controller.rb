@@ -3,9 +3,8 @@ class ShippingsController < ApplicationController
 attr_reader :ups_rates, :fedex_rates
 
   def find_rate
-
-    if params.empty?
-      render :json => {missing_info: "please provide params in the url"}, :status => :bad_request
+    if params[:weight] == nil || params[:origin_zip] == nil || params[:dest_zip] == nil
+      return :json => [], :status => :bad_request
     end
 
     packages = ActiveShipping::Package.new(params[:weight].to_i, [40, 40, 40])
