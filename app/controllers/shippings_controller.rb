@@ -4,7 +4,7 @@ attr_reader :ups_rates, :fedex_rates
 
   def find_rate
     if params[:weight] == nil || params[:origin_zip] == nil || params[:dest_zip] == nil
-      return :json => [], :status => :bad_request
+      return :json => []
     end
 
     packages = ActiveShipping::Package.new(params[:weight].to_i, [40, 40, 40])
@@ -22,7 +22,12 @@ attr_reader :ups_rates, :fedex_rates
     # send back to petsy:
     # @ups_rates = response.rates.sort_by(&:price).collect {|rate| [rate.service_name, rate.price]}
 
-    render json: results
+    # if results
+    #   render json: results, :status => :ok
+    # else
+    #   render json: [], :status => :bad_request
+    # end
+
     # @fedex_rates = response.rates.sort_by(&:price).collect {|rate| [rate.service_name, rate.price]}
 
 
