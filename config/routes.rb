@@ -1,9 +1,6 @@
 Rails.application.routes.draw do
-  get 'shippings/index'
 
-  get 'shippings/new'
-
-  get 'shippings/create'
+  get '/', to: 'shippings#find_rate'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
