@@ -3,7 +3,7 @@ class ShippingsController < ApplicationController
 attr_reader :ups_rates, :fedex_rates
 
   def find_rate
-    packages = ActiveShipping::Package.new(params[:weight].to_i, [93,10], {cylinder: true})
+    packages = ActiveShipping::Package.new(params[:weight].to_i, [40, 40, 40])
 
     origin = ActiveShipping::Location.new(country: 'US', zip: params[:origin_zip])
 
@@ -31,7 +31,7 @@ attr_reader :ups_rates, :fedex_rates
     results = []
     rates = response.rates
     rates.each do |shipping_stuff|
-      results << {name: shipping_stuff.service_name, cost: shipping_stuff.total_price}
+      results << {name: shipping_stuff.service_name, cost: "$#{((shipping_stuff.total_price)/100.0).round(2)}"}
     end
     return results
   end
