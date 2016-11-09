@@ -3,37 +3,32 @@ class ShippingsController < ApplicationController
 attr_reader :ups_rates, :fedex_rates
 
   def find_rate
-    if params[:weight] == nil || params[:origin_zip] == nil || params[:dest_zip] == nil
-      return :json => []
+    unless params.keys.include?("weight") || params.keys.include?("origin_zip") || params.keys.include?("dest_zip")
+      results = ["please provide params"]
+      status = :bad_request
+      # return :json => ["please provide params"], :status => :bad_request
+    else
+
+      packages = ActiveShipping::Package.new(params[:weight].to_i, [40, 40, 40])
+
+      origin = ActiveShipping::Location.new(country: 'US', zip: params[:origin_zip])
+
+      destination = ActiveShipping::Location.new(country: 'US', zip: params[:dest_zip])
+
+      ups = ActiveShipping::UPS.new(login: ENV["UPS_LOGIN"], password: ENV["UPS_PWD"], key: ENV["UPS_KEY"])
+      response = ups.find_rates(origin, destination, packages)
+
+      # fedex = ActiveShipping::FedEx.new(login: ENV["FEDEX_LOGIN"], password: ENV["FEDEX_PWD"], key: ENV["FEDEX_KEY"], account: ENV["FEDEX_ACNT"])
+      # response = fedex.find_rates(origin, destination, packages)
+      results = parseResponse(response)
+      status = :ok
     end
 
-    packages = ActiveShipping::Package.new(params[:weight].to_i, [40, 40, 40])
-
-    origin = ActiveShipping::Location.new(country: 'US', zip: params[:origin_zip])
-
-    destination = ActiveShipping::Location.new(country: 'US', zip: params[:dest_zip])
-
-    ups = ActiveShipping::UPS.new(login: ENV["UPS_LOGIN"], password: ENV["UPS_PWD"], key: ENV["UPS_KEY"])
-    response = ups.find_rates(origin, destination, packages)
-
-    # fedex = ActiveShipping::FedEx.new(login: ENV["FEDEX_LOGIN"], password: ENV["FEDEX_PWD"], key: ENV["FEDEX_KEY"], account: ENV["FEDEX_ACNT"])
-    # response = fedex.find_rates(origin, destination, packages)
-    results = parseResponse(response)
-    # send back to petsy:
+      render :json => results, :status => status
     # @ups_rates = response.rates.sort_by(&:price).collect {|rate| [rate.service_name, rate.price]}
-
-    # if results
-    #   render json: results, :status => :ok
-    # else
-    #   render json: [], :status => :bad_request
-    # end
 
     # @fedex_rates = response.rates.sort_by(&:price).collect {|rate| [rate.service_name, rate.price]}
 
-
-    # calc using AS gem
-    # save shipping methods as models in our db.
-    # send back response to pesty
   end
 
   def parseResponse(response)
