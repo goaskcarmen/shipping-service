@@ -12,11 +12,16 @@ class ShippingsController < ApplicationController
 
       destination = ActiveShipping::Location.new(country: 'US', zip: params[:dest_zip])
 
-      ups = ActiveShipping::UPS.new(login: ENV["UPS_LOGIN"], password: ENV["UPS_PWD"], key: ENV["UPS_KEY"])
-      response = ups.find_rates(origin, destination, packages)
+      # ups = ActiveShipping::UPS.new(login: ENV["UPS_LOGIN"], password: ENV["UPS_PWD"], key: ENV["UPS_KEY"])
+      # response = ups.find_rates(origin, destination, packages)
+      #
+      fedex = ActiveShipping::FedEx.new(login: ENV["FEDEX_METER_NUM"], password: ENV["FEDEX_PWD"], key: ENV["FEDEX_KEY"], account: ENV["FEDEX_ACNT"], test: true)
+      response = fedex.find_rates(origin, destination, packages)
 
-      # fedex = ActiveShipping::FedEx.new(login: ENV["FEDEX_LOGIN"], password: ENV["FEDEX_PWD"], key: ENV["FEDEX_KEY"], account: ENV["FEDEX_ACNT"])
-      # response = fedex.find_rates(origin, destination, packages)
+      # usps = ActiveShipping::USPS.new(login: ENV["USPS_LOGIN"])
+      #
+      # response = usps.find_rates(origin, destination, packages)
+
       results = parseResponse(response)
       status = :ok
     end
