@@ -2,7 +2,7 @@
 require 'simplecov'
 SimpleCov.start
 ########## added for simplecov ############
-
+require 'minitest/reporters'
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
@@ -13,4 +13,5 @@ class ActiveSupport::TestCase
   fixtures :all
 
   # Add more helper methods to be used by all tests here...
+    Minitest::Reporters.use!
 end

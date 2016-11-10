@@ -1,12 +1,9 @@
 class ShippingsController < ApplicationController
 
-attr_reader :ups_rates, :fedex_rates
-
   def find_rate
-    unless params.keys.include?("weight") || params.keys.include?("origin_zip") || params.keys.include?("dest_zip")
+    unless params.keys.include?("weight") && params.keys.include?("origin_zip") && params.keys.include?("dest_zip")
       results = ["please provide params"]
       status = :bad_request
-      # return :json => ["please provide params"], :status => :bad_request
     else
 
       packages = ActiveShipping::Package.new(params[:weight].to_i, [40, 40, 40])
@@ -38,10 +35,6 @@ attr_reader :ups_rates, :fedex_rates
       results << {name: shipping_stuff.service_name, cost: "$#{((shipping_stuff.total_price)/100.0).round(2)}"}
     end
     return results
-  end
-
-  def create
-
   end
 
 end
