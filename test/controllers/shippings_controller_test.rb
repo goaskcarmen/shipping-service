@@ -19,8 +19,11 @@ class ShippingsControllerTest < ActionController::TestCase
 
   test "that find_rate returns shipping rate" do
     get :find_rate, {"weight" => "100", "origin_zip" => "10001", "dest_zip" => "98100"}
+    body = JSON.parse(response.body)
+
+    assert_instance_of Array, body
+    assert_equal ["name", "cost"], body.map(&:keys).flatten.uniq
 
     assert_response :ok
-    
   end
 end
