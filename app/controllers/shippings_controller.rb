@@ -1,12 +1,9 @@
 class ShippingsController < ApplicationController
 
-attr_reader :ups_rates, :fedex_rates
-
   def find_rate
-    unless params.keys.include?("weight") || params.keys.include?("origin_zip") || params.keys.include?("dest_zip")
+    unless params.keys.include?("weight") && params.keys.include?("origin_zip") && params.keys.include?("dest_zip")
       results = ["please provide params"]
       status = :bad_request
-      # return :json => ["please provide params"], :status => :bad_request
     else
 
       packages = ActiveShipping::Package.new(params[:weight].to_i, [40, 40, 40])
@@ -15,11 +12,16 @@ attr_reader :ups_rates, :fedex_rates
 
       destination = ActiveShipping::Location.new(country: 'US', zip: params[:dest_zip])
 
-      ups = ActiveShipping::UPS.new(login: ENV["UPS_LOGIN"], password: ENV["UPS_PWD"], key: ENV["UPS_KEY"])
-      response = ups.find_rates(origin, destination, packages)
+      # ups = ActiveShipping::UPS.new(login: ENV["UPS_LOGIN"], password: ENV["UPS_PWD"], key: ENV["UPS_KEY"])
+      # response = ups.find_rates(origin, destination, packages)
+      #
+      fedex = ActiveShipping::FedEx.new(login: ENV["FEDEX_METER_NUM"], password: ENV["FEDEX_PWD"], key: ENV["FEDEX_KEY"], account: ENV["FEDEX_ACNT"], test: true)
+      response = fedex.find_rates(origin, destination, packages)
 
-      # fedex = ActiveShipping::FedEx.new(login: ENV["FEDEX_LOGIN"], password: ENV["FEDEX_PWD"], key: ENV["FEDEX_KEY"], account: ENV["FEDEX_ACNT"])
-      # response = fedex.find_rates(origin, destination, packages)
+      # usps = ActiveShipping::USPS.new(login: ENV["USPS_LOGIN"])
+      #
+      # response = usps.find_rates(origin, destination, packages)
+
       results = parseResponse(response)
       status = :ok
     end
@@ -38,10 +40,6 @@ attr_reader :ups_rates, :fedex_rates
       results << {name: shipping_stuff.service_name, cost: "$#{((shipping_stuff.total_price)/100.0).round(2)}"}
     end
     return results
-  end
-
-  def create
-
   end
 
 end
